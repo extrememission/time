@@ -1,4 +1,5 @@
-<html lang="en"><head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="site.webmanifest">
@@ -62,6 +63,17 @@
                 transform: translateX(-100%);
             }
         }
+
+        /* Cursor blinking animation */
+        .blink {
+            animation: blink-animation 1s steps(1) infinite;
+        }
+
+        @keyframes blink-animation {
+            50% {
+                visibility: hidden;
+            }
+        }
     </style>
 </head>
 <body cz-shortcut-listen="true">
@@ -77,6 +89,7 @@
     </div>
 
     <script>
+        // Update the time every 500ms
         function updateTime() {
             const now = new Date();
             let hours = now.getHours();
@@ -90,9 +103,10 @@
 
         setInterval(updateTime, 500);
 
+        // Service Worker registration script
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js').then((registration) => {
+                navigator.serviceWorker.register('/service-worker.js').then((registration) => {
                     console.log('Service Worker registered with scope:', registration.scope);
                 }).catch((error) => {
                     console.error('Service Worker registration failed:', error);
@@ -101,5 +115,44 @@
         }
     </script>
 
+    <script>
+        // Service worker implementation (inline script)
+        if ('serviceWorker' in navigator) {
+            if (navigator.serviceWorker.controller) {
+                console.log('Service Worker is controlling the page.');
+            } else {
+                console.log('Service Worker is not controlling the page.');
+            }
+            
+            // Inline the service worker content in case of basic functionality
+            const serviceWorkerCode = `
+                self.addEventListener('install', (event) => {
+                    console.log('Service Worker installed');
+                });
 
-</body></html>
+                self.addEventListener('activate', (event) => {
+                    console.log('Service Worker activated');
+                });
+
+                self.addEventListener('fetch', (event) => {
+                    event.respondWith(
+                        caches.match(event.request).then((cachedResponse) => {
+                            return cachedResponse || fetch(event.request);
+                        })
+                    );
+                });
+            `;
+
+            // Register a service worker from the inline JavaScript
+            const blob = new Blob([serviceWorkerCode], { type: 'application/javascript' });
+            const serviceWorkerUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(serviceWorkerUrl).then((registration) => {
+                console.log('Service Worker successfully registered.');
+            }).catch((error) => {
+                console.error('Service Worker registration failed:', error);
+            });
+        }
+    </script>
+
+</body>
+</html>
