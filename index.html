@@ -32,6 +32,7 @@
             background-color: black;
             color: #0a3e1e;
             overflow: hidden;
+            position: relative;
         }
 
         #time-container {
@@ -42,7 +43,7 @@
         }
 
         h1 {
-            font-size: 15vw; /* Adjust size to fit well on the screen */
+            font-size: 45vw; /* Keep original large size for time */
             margin: 0; /* Remove margins to adjust positioning */
             line-height: 1;
         }
@@ -52,17 +53,22 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%); /* Center it both horizontally and vertically */
+            width: 90%; /* Make sure it adjusts for screen size */
+            max-width: 100%;
         }
 
         .quote {
-            font-size: 15vw; /* Automatically adjust the font size */
-            white-space: nowrap;
+            font-size: 10vw; /* This is the base font size for the phrase */
+            white-space: normal; /* Allow wrapping of long phrases */
             overflow: hidden;
+            word-wrap: break-word;
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%); /* Keep it centered */
+            text-align: center;
+            width: 100%; /* Ensure the text container is responsive */
         }
 
         /* Blinking cursor animation */
