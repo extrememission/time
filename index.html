@@ -8,7 +8,6 @@
         /* Full-screen background for the page */
         body {
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh; /* Full viewport height */
@@ -21,15 +20,15 @@
             text-align: center;
         }
 
-        /* Center the time container */
+        /* Center the time container using Flexbox */
         #time-container {
-            position: absolute;
-            top: 10%;
-            left: 50%;
-            transform: translateX(-50%);
             display: flex;
             justify-content: center;
             align-items: center;
+            position: absolute;
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Offset by 50% of its own size */
             white-space: nowrap; /* Prevent wrapping */
         }
 
@@ -37,7 +36,7 @@
             margin: 0;
             line-height: 1;
             letter-spacing: 0.1em;
-            font-size: 95vmin; /* Slightly smaller than before */
+            font-size: 95vmin; /* Slightly smaller than before, but still big */
         }
 
         /* Phrases scrolling across the screen */
