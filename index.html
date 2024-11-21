@@ -2,7 +2,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="manifest" href="site.webmanifest">
     <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
     <title>SHQ Time</title>
     <style>
@@ -19,19 +18,26 @@
             color: #0a3e1e;
             overflow: hidden;
             position: relative;
+            text-align: center;
         }
 
-        /* Center the time container and keep it at the top */
+        /* Centering Time Container */
         #time-container {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap; /* Prevent text from wrapping */
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
         h1 {
+            font-size: 20vw; /* Base size to make the time as large as possible */
             margin: 0;
             line-height: 1;
-            font-size: 10vw; /* Large size based on viewport width */
+            letter-spacing: 0.1em;
         }
 
         /* Full viewport height for the quote container */
@@ -42,21 +48,25 @@
             width: 100%;
             height: 100vh; /* Full viewport height */
             position: absolute;
-            top: 0;
+            top: 20%; /* Center quote */
             left: 0;
-            text-align: justify; /* Full justification */
+            right: 0;
+            text-align: center; /* Center text horizontally */
+            overflow: hidden;
         }
 
         .quote {
-            font-size: 8vw; /* Adjust base font size for quotes */
-            white-space: normal; /* Allow wrapping of long phrases */
-            word-wrap: break-word; /* Ensure text breaks appropriately */
-            width: 90%; /* Ensure the text container adjusts to screen width */
+            font-size: 10vw; /* Base size for quote text */
+            line-height: 1.2;
+            white-space: normal;
+            word-wrap: break-word;
+            max-width: 90%; /* Allow the text to break to the next line if too wide */
             position: absolute;
             top: 50%;
-            transform: translateY(-50%); /* Center vertically */
+            transform: translateY(-50%);
             text-align: justify;
-            hyphens: auto; /* Allow word-breaking */
+            hyphens: auto;
+            word-spacing: 0.05em; /* Help with justification */
         }
 
         /* Blinking cursor animation */
@@ -98,7 +108,7 @@
         const timeElement = document.getElementById("time-container");
         const quoteElement = document.getElementById("quote");
 
-        // Function to update time
+        // Function to dynamically calculate maximum font size for the time
         function updateTime() {
             const now = new Date();
             let hours = now.getHours();
@@ -108,13 +118,37 @@
             hours = hours % 12 || 12;
             document.getElementById('hours').textContent = hours;
             document.getElementById('minutes').textContent = minutes;
+
+            // Dynamically scale the font size of time
+            const timeElement = document.querySelector("#time-container h1");
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+
+            // Scale time dynamically to fill screen but not overflow
+            const maxSize = Math.min(screenWidth, screenHeight) * 0.2;
+            timeElement.style.fontSize = `${maxSize}px`;
         }
 
-        // Initial update of time when the page loads
+        // Function to dynamically adjust quote text size
+        function updateQuoteSize() {
+            const quoteElement = document.querySelector("#quote");
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+
+            // Scale quote dynamically to fill the available space
+            const maxSize = Math.min(screenWidth, screenHeight) * 0.1; // Adjust factor as needed
+            quoteElement.style.fontSize = `${maxSize}px`;
+        }
+
+        // Initial update of time and quote size when the page loads
         updateTime();
+        updateQuoteSize();
 
         // Update time every 500ms to keep it real-time
-        setInterval(updateTime, 500);
+        setInterval(() => {
+            updateTime();
+            updateQuoteSize();
+        }, 500);
 
         function showPhrase() {
             // Hide time and show phrase
