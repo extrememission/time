@@ -34,7 +34,6 @@
         }
 
         h1 {
-            font-size: 100vmin; /* Make time very large */
             margin: 0;
             line-height: 1;
             letter-spacing: 0.1em;
@@ -122,7 +121,7 @@
         const timeElement = document.getElementById("time-container");
         const quoteElement = document.getElementById("quote");
 
-        // Function to update the time
+        // Function to dynamically update the time size
         function updateTime() {
             const now = new Date();
             let hours = now.getHours();
@@ -132,26 +131,34 @@
             hours = hours % 12 || 12;
             document.getElementById('hours').textContent = hours;
             document.getElementById('minutes').textContent = minutes;
+
+            // Dynamically adjust time font size based on the smallest screen dimension (width or height)
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+
+            // Scale time font size to fit within the screen, without overflowing
+            const maxTimeFontSize = Math.min(screenWidth, screenHeight) * 0.1; // 10% of screen size
+            timeElement.querySelector('h1').style.fontSize = `${maxTimeFontSize}px`;
         }
 
-        // Initial update of time
+        // Initial update of time size
         updateTime();
 
         // Update time every 500ms to keep it real-time
         setInterval(updateTime, 500);
 
+        // Function to show a new phrase
         function showPhrase() {
-            // Change phrase text
             quoteElement.textContent = phrases[phraseIndex];
 
             // Move to the next phrase (looping through the array)
             phraseIndex = (phraseIndex + 1) % phrases.length;
         }
 
-        // Cycle through the phrases
+        // Cycle through the phrases every 5 seconds
         setInterval(() => {
             showPhrase();
-        }, 5000); // New phrase every 5 seconds
+        }, 5000); // Show new phrase every 5 seconds
 
     </script>
 
