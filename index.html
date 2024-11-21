@@ -49,13 +49,14 @@
         }
 
         #quote-container {
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100vh; /* Full height of viewport */
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%); /* Center it both horizontally and vertically */
-            width: 90%; /* Make sure it adjusts for screen size */
-            max-width: 100%;
+            top: 0;
+            left: 0;
         }
 
         .quote {
@@ -63,12 +64,11 @@
             white-space: normal; /* Allow wrapping of long phrases */
             overflow: hidden;
             word-wrap: break-word;
+            text-align: center;
+            max-width: 90%; /* Ensure the text container is responsive */
             position: absolute;
             top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%); /* Keep it centered */
-            text-align: center;
-            width: 100%; /* Ensure the text container is responsive */
+            transform: translateY(-50%); /* Center vertically in the middle */
         }
 
         /* Blinking cursor animation */
@@ -109,6 +109,7 @@
         const timeElement = document.getElementById("time-container");
         const quoteElement = document.getElementById("quote");
 
+        // Function to update time
         function updateTime() {
             const now = new Date();
             let hours = now.getHours();
@@ -119,6 +120,9 @@
             document.getElementById('hours').textContent = hours;
             document.getElementById('minutes').textContent = minutes;
         }
+
+        // Initial update of time when the page loads
+        updateTime();
 
         // Update time every 500ms to keep it real-time
         setInterval(updateTime, 500);
