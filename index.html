@@ -36,35 +36,30 @@
 
         #time-container {
             margin-bottom: 20px; /* Space below the time */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         h1 {
-            font-size: 45vw; /* Keep the same size */
+            font-size: 10vw; /* Font size adjusts automatically */
             margin: 0; /* Remove margins to adjust positioning */
             line-height: 1;
         }
 
         #quote-container {
             text-align: center;
+            position: absolute;
         }
 
         .quote {
-            font-size: 5vw;
-            white-space: nowrap; 
-            overflow: hidden; 
-            animation: scroll-text 10s linear infinite; 
+            font-size: 10vw; /* Automatically adjust the font size */
+            white-space: nowrap;
+            overflow: hidden;
+            position: absolute;
         }
 
-        @keyframes scroll-text {
-            from {
-                transform: translateX(100%);
-            }
-            to {
-                transform: translateX(-100%);
-            }
-        }
-
-        /* Cursor blinking animation */
+        /* Blinking cursor animation */
         .blink {
             animation: blink-animation 1s steps(1) infinite;
         }
@@ -74,13 +69,14 @@
                 visibility: hidden;
             }
         }
+
     </style>
 </head>
 <body cz-shortcut-listen="true">
 
     <div id="time-container">
         <h1>
-            <span id="hours">6</span><span class="blink">:</span><span id="minutes">46</span>
+            <span id="hours">8</span><span class="blink">:</span><span id="minutes">00</span>
         </h1>
     </div>
 
@@ -89,69 +85,59 @@
     </div>
 
     <script>
-        // Update the time every 500ms
+        const phrases = [
+            "The journey begins.",
+            "Embrace the challenge.",
+            "Live your dream.",
+            "The future is now.",
+            "Make it happen.",
+            "Stay curious."
+        ];
+
+        let phraseIndex = 0;
+        const timeElement = document.getElementById("time-container");
+        const quoteElement = document.getElementById("quote");
+
         function updateTime() {
             const now = new Date();
             let hours = now.getHours();
             const minutes = now.getMinutes().toString().padStart(2, '0');
 
-            // Convert to 12-hour format
-            hours = hours % 12 || 12; // Convert 0 to 12
+            // Convert to 12-hour format, and ensure 0 becomes 12
+            hours = hours % 12 || 12;
             document.getElementById('hours').textContent = hours;
             document.getElementById('minutes').textContent = minutes;
         }
 
+        // Update time every 500ms to keep it real-time
         setInterval(updateTime, 500);
 
-        // Service Worker registration script
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js').then((registration) => {
-                    console.log('Service Worker registered with scope:', registration.scope);
-                }).catch((error) => {
-                    console.error('Service Worker registration failed:', error);
-                });
-            });
+        function showPhrase() {
+            // Hide time and show phrase
+            timeElement.style.display = 'none';
+            quoteElement.textContent = phrases[phraseIndex];
+            quoteElement.style.display = 'block';
+
+            // Move to the next phrase (looping through the array)
+            phraseIndex = (phraseIndex + 1) % phrases.length;
+
+            // After 1 second, hide the phrase and show the time again
+            setTimeout(() => {
+                quoteElement.style.display = 'none';
+                timeElement.style.display = 'flex';
+            }, 1000); // Display the phrase for 1 second
         }
-    </script>
 
-    <script>
-        // Service worker implementation (inline script)
-        if ('serviceWorker' in navigator) {
-            if (navigator.serviceWorker.controller) {
-                console.log('Service Worker is controlling the page.');
-            } else {
-                console.log('Service Worker is not controlling the page.');
-            }
-            
-            // Inline the service worker content in case of basic functionality
-            const serviceWorkerCode = `
-                self.addEventListener('install', (event) => {
-                    console.log('Service Worker installed');
-                });
+        // Cycle through time and phrases: 4 seconds time -> 1 second phrase
+        setInterval(() => {
+            // Show time for 4 seconds, then show phrase for 1 second
+            timeElement.style.display = 'flex';
+            quoteElement.style.display = 'none';
 
-                self.addEventListener('activate', (event) => {
-                    console.log('Service Worker activated');
-                });
+            // After 4 seconds, show a new phrase
+            setTimeout(showPhrase, 4000); // Display phrase after 4 seconds
+        }, 5000); // Repeat every 5 seconds
 
-                self.addEventListener('fetch', (event) => {
-                    event.respondWith(
-                        caches.match(event.request).then((cachedResponse) => {
-                            return cachedResponse || fetch(event.request);
-                        })
-                    );
-                });
-            `;
-
-            // Register a service worker from the inline JavaScript
-            const blob = new Blob([serviceWorkerCode], { type: 'application/javascript' });
-            const serviceWorkerUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(serviceWorkerUrl).then((registration) => {
-                console.log('Service Worker successfully registered.');
-            }).catch((error) => {
-                console.error('Service Worker registration failed:', error);
-            });
-        }
     </script>
 
 </body>
