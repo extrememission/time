@@ -21,77 +21,91 @@
             text-align: center;
         }
 
-        /* Centering Time Container */
+        /* Center the time container */
         #time-container {
             position: absolute;
             top: 10%;
             left: 50%;
             transform: translateX(-50%);
-            white-space: nowrap; /* Prevent text from wrapping */
             display: flex;
             justify-content: center;
             align-items: center;
+            white-space: nowrap; /* Prevent wrapping */
         }
 
         h1 {
-            font-size: 20vw; /* Base size to make the time as large as possible */
+            font-size: 100vmin; /* Make time very large */
             margin: 0;
             line-height: 1;
             letter-spacing: 0.1em;
         }
 
-        /* Full viewport height for the quote container */
+        /* Phrases scrolling across the screen */
         #quote-container {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7); /* Translucent white */
+            font-size: 10vw;
+            font-weight: bold;
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 100%;
-            height: 100vh; /* Full viewport height */
-            position: absolute;
-            top: 20%; /* Center quote */
-            left: 0;
-            right: 0;
-            text-align: center; /* Center text horizontally */
-            overflow: hidden;
+            pointer-events: none; /* Prevent interaction */
+            animation: scroll-phrases 15s linear infinite;
         }
 
         .quote {
-            font-size: 10vw; /* Base size for quote text */
-            line-height: 1.2;
-            white-space: normal;
-            word-wrap: break-word;
-            max-width: 90%; /* Allow the text to break to the next line if too wide */
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            text-align: justify;
-            hyphens: auto;
-            word-spacing: 0.05em; /* Help with justification */
+            opacity: 0; /* Start invisible */
+            animation: fade-in-out 5s ease-in-out infinite; /* Fading effect */
+            white-space: nowrap;
         }
 
-        /* Blinking cursor animation */
-        .blink {
-            animation: blink-animation 1s steps(1) infinite;
+        /* Scroll animation for phrases */
+        @keyframes scroll-phrases {
+            0% {
+                left: 100%;
+            }
+            100% {
+                left: -100%;
+            }
         }
 
-        @keyframes blink-animation {
-            50% {
-                visibility: hidden;
+        /* Fade-in and fade-out for the quotes */
+        @keyframes fade-in-out {
+            0% {
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
             }
         }
 
     </style>
 </head>
-<body cz-shortcut-listen="true">
+<body>
 
+    <!-- Time Container -->
     <div id="time-container">
         <h1>
             <span id="hours"></span><span class="blink">:</span><span id="minutes"></span>
         </h1>
     </div>
 
+    <!-- Quote Container -->
     <div id="quote-container">
-        <p class="quote" id="quote"></p>
+        <div class="quote" id="quote"></div>
     </div>
 
     <script>
@@ -108,7 +122,7 @@
         const timeElement = document.getElementById("time-container");
         const quoteElement = document.getElementById("quote");
 
-        // Function to dynamically calculate maximum font size for the time
+        // Function to update the time
         function updateTime() {
             const now = new Date();
             let hours = now.getHours();
@@ -118,63 +132,26 @@
             hours = hours % 12 || 12;
             document.getElementById('hours').textContent = hours;
             document.getElementById('minutes').textContent = minutes;
-
-            // Dynamically scale the font size of time
-            const timeElement = document.querySelector("#time-container h1");
-            const screenWidth = window.innerWidth;
-            const screenHeight = window.innerHeight;
-
-            // Scale time dynamically to fill screen but not overflow
-            const maxSize = Math.min(screenWidth, screenHeight) * 0.2;
-            timeElement.style.fontSize = `${maxSize}px`;
         }
 
-        // Function to dynamically adjust quote text size
-        function updateQuoteSize() {
-            const quoteElement = document.querySelector("#quote");
-            const screenWidth = window.innerWidth;
-            const screenHeight = window.innerHeight;
-
-            // Scale quote dynamically to fill the available space
-            const maxSize = Math.min(screenWidth, screenHeight) * 0.1; // Adjust factor as needed
-            quoteElement.style.fontSize = `${maxSize}px`;
-        }
-
-        // Initial update of time and quote size when the page loads
+        // Initial update of time
         updateTime();
-        updateQuoteSize();
 
         // Update time every 500ms to keep it real-time
-        setInterval(() => {
-            updateTime();
-            updateQuoteSize();
-        }, 500);
+        setInterval(updateTime, 500);
 
         function showPhrase() {
-            // Hide time and show phrase
-            timeElement.style.display = 'none';
+            // Change phrase text
             quoteElement.textContent = phrases[phraseIndex];
-            quoteElement.style.display = 'block';
 
             // Move to the next phrase (looping through the array)
             phraseIndex = (phraseIndex + 1) % phrases.length;
-
-            // After 1 second, hide the phrase and show the time again
-            setTimeout(() => {
-                quoteElement.style.display = 'none';
-                timeElement.style.display = 'flex';
-            }, 1000); // Display the phrase for 1 second
         }
 
-        // Cycle through time and phrases: 4 seconds time -> 1 second phrase
+        // Cycle through the phrases
         setInterval(() => {
-            // Show time for 4 seconds, then show phrase for 1 second
-            timeElement.style.display = 'flex';
-            quoteElement.style.display = 'none';
-
-            // After 4 seconds, show a new phrase
-            setTimeout(showPhrase, 4000); // Display phrase after 4 seconds
-        }, 5000); // Repeat every 5 seconds
+            showPhrase();
+        }, 5000); // New phrase every 5 seconds
 
     </script>
 
