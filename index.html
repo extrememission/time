@@ -1,18 +1,20 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet">
     <title>SHQ Time</title>
     <style>
         /* Full-screen background for the page */
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh; /* Full viewport height */
             margin: 0; /* Remove default margin */
-            font-family: 'Oswald', sans-serif;
+            font-family: 'Black Ops One', sans-serif;
             background-color: black;
             color: #0a3e1e;
             overflow: hidden;
@@ -26,69 +28,26 @@
             justify-content: center;
             align-items: center;
             position: absolute;
-            top: 50%; /* Center vertically */
+            top: 40%; /* Adjust to center vertically */
             left: 50%; /* Center horizontally */
             transform: translate(-50%, -50%); /* Offset by 50% of its own size */
             white-space: nowrap; /* Prevent wrapping */
+            font-size: 15vw; /* Set the font size dynamically based on viewport width */
+        }
+
+        #date-container {
+            position: absolute;
+            top: 50%; /* Reduced distance between time and date */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 5vw; /* Smaller font for the date */
+            letter-spacing: 0.05em;
         }
 
         h1 {
             margin: 0;
             line-height: 1;
             letter-spacing: 0.1em;
-            font-size: 95vmin; /* Slightly smaller than before, but still big */
-        }
-
-        /* Phrases scrolling across the screen */
-        #quote-container {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.7); /* Translucent white */
-            font-size: 10vw;
-            font-weight: bold;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            pointer-events: none; /* Prevent interaction */
-            animation: scroll-phrases 15s linear infinite;
-        }
-
-        .quote {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 0; /* Start invisible */
-            animation: fade-in-out 5s ease-in-out infinite; /* Fading effect */
-            white-space: nowrap;
-        }
-
-        /* Scroll animation for phrases */
-        @keyframes scroll-phrases {
-            0% {
-                left: 100%;
-            }
-            100% {
-                left: -100%;
-            }
-        }
-
-        /* Fade-in and fade-out for the quotes */
-        @keyframes fade-in-out {
-            0% {
-                opacity: 0;
-            }
-            20% {
-                opacity: 1;
-            }
-            80% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-            }
         }
 
         /* Blinking colon animation */
@@ -102,8 +61,34 @@
             }
         }
 
+        /* Limit the size of the text to avoid overflow */
+        @media (max-width: 600px) {
+            #time-container {
+                font-size: 20vw; /* Adjust font size for very small screens */
+            }
+            #date-container {
+                font-size: 8vw;
+            }
+        }
+
+        @media (min-width: 600px) and (max-width: 1024px) {
+            #time-container {
+                font-size: 12vw; /* Adjust font size for medium screens */
+            }
+            #date-container {
+                font-size: 6vw;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            #time-container {
+                font-size: 10vw; /* Full size for larger screens */
+            }
+            #date-container {
+                font-size: 4vw;
+            }
+        }
     </style>
-    <link rel="manifest" href="/manifest.json">
 </head>
 <body>
 
@@ -114,24 +99,12 @@
         </h1>
     </div>
 
-    <!-- Quote Container -->
-    <div id="quote-container">
-        <div class="quote" id="quote"></div>
+    <!-- Date Container -->
+    <div id="date-container">
+        <span id="date"></span>
     </div>
 
     <script>
-        const phrases = [
-            "I ARISE TODAY BY THE STRENGTH OF CHRIST",
-            "BE STRONG",
-            "MY SOUL DOTH MAGNIFY THE LORD",
-            "SEEK HIS FACE CONTINUALLY",
-            "I WILL BLESS THE LORD AT ALL TIMES"
-        ];
-
-        let phraseIndex = 0;
-        const timeElement = document.getElementById("time-container");
-        const quoteElement = document.getElementById("quote");
-
         // Function to update the time
         function updateTime() {
             const now = new Date();
@@ -142,37 +115,65 @@
             hours = hours % 12 || 12;
             document.getElementById('hours').textContent = hours;
             document.getElementById('minutes').textContent = minutes;
+
+            // Update the date (e.g., "November 27, 2024")
+            const date = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('date').textContent = date;
         }
 
-        // Initial update of time
+        // Initial update of time and date
         updateTime();
 
         // Update time every 500ms to keep it real-time
         setInterval(updateTime, 500);
-
-        // Function to show a new phrase
-        function showPhrase() {
-            quoteElement.textContent = phrases[phraseIndex];
-
-            // Move to the next phrase (looping through the array)
-            phraseIndex = (phraseIndex + 1) % phrases.length;
-        }
-
-        // Cycle through the phrases every 5 seconds
-        setInterval(() => {
-            showPhrase();
-        }, 5000); // Show new phrase every 5 seconds
-
     </script>
-<script>
+
+    <!-- Inline Service Worker Script -->
+    <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-            .then(registration => {
-                console.log('Service Worker registered with scope:', registration.scope);
-            })
-            .catch(error => {
-                console.log('Service Worker registration failed:', error);
-            });
+            // Create a Blob to represent the service worker script
+            const serviceWorkerScript = `
+                self.addEventListener('install', (event) => {
+                    console.log('Service Worker installed');
+                    event.waitUntil(
+                        caches.open('my-cache').then((cache) => {
+                            return cache.addAll([
+                                '/', // Cache the root (index.html)
+                                '/styles.css', // Add any assets like CSS
+                                '/scripts.js', // Include any other JS files if needed
+                            ]);
+                        })
+                    );
+                });
+
+                self.addEventListener('fetch', (event) => {
+                    event.respondWith(
+                        caches.match(event.request).then((cachedResponse) => {
+                            return cachedResponse || fetch(event.request);
+                        })
+                    );
+                });
+            `;
+            
+            // Create a Blob object for the script
+            const blob = new Blob([serviceWorkerScript], { type: 'application/javascript' });
+
+            // Create a URL for the Blob and register the service worker from this URL
+            const serviceWorkerURL = URL.createObjectURL(blob);
+
+            // Register the service worker
+            navigator.serviceWorker.register(serviceWorkerURL)
+                .then(registration => {
+                    console.log('Service Worker registered with the Blob URL:', registration.scope);
+                })
+                .catch(error => {
+                    console.log('Service Worker registration failed:', error);
+                });
         }
     </script>
 </body>
