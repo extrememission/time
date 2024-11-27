@@ -25,17 +25,17 @@
             text-align: center;
         }
 
-        /* "REDEEMING THE TIME" text styling */
+        /* "REDEEMING THE TIME" text styling (above the time) */
         #header-text {
             position: absolute;
-            top: 20%; /* Positioned near the top of the screen */
+            top: 10%; /* Positioned near the top of the screen */
             left: 50%;
             transform: translateX(-50%);
             font-family: 'Oswald', sans-serif;
-            font-size: 6vw;
+            font-size: 3vw; /* Smaller font size */
             letter-spacing: 0.3em; /* Large spacing between characters */
             text-transform: uppercase;
-            color: white;
+            color: 0a3e1e;
         }
 
         #time-container {
@@ -83,6 +83,9 @@
             #date-container {
                 font-size: 8vw;
             }
+            #header-text {
+                font-size: 6vw;
+            }
         }
 
         @media (min-width: 600px) and (max-width: 1024px) {
@@ -92,6 +95,9 @@
             #date-container {
                 font-size: 6vw;
             }
+            #header-text {
+                font-size: 4vw;
+            }
         }
 
         @media (min-width: 1024px) {
@@ -100,6 +106,9 @@
             }
             #date-container {
                 font-size: 4vw;
+            }
+            #header-text {
+                font-size: 3vw;
             }
         }
     </style>
@@ -159,7 +168,7 @@
 </head>
 <body>
 
-    <!-- REDEEMING THE TIME Text -->
+    <!-- REDEEMING THE TIME Text (Above the time) -->
     <div id="header-text">
         REDEEMING THE TIME
     </div>
