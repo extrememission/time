@@ -6,9 +6,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Oswald&display=swap" rel="stylesheet">
     <meta name="theme-color" content="#0a3e1e">
     <meta name="description" content="Redeeming the time because the days are evil">
-    <link rel="apple-touch-icon" href="data:image/png;base64,..." /> <!-- Base64 icon data goes here -->
-    <link rel="icon" href="data:image/png;base64,..." /> <!-- Base64 icon data goes here -->
-
     <title>Redeeming the Time</title>
 
     <style>
@@ -128,6 +125,55 @@
         link.href = manifestURL;
         document.head.appendChild(link);
     </script>
+
+    <!-- Blinking Colon Favicon Script -->
+    <script>
+        // Function to create the animated favicon with blinking colon
+        function createFavicon() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const color = '#0a3e1e';  // Green color for the colon
+            const size = 32;  // Set the canvas size (favicon size)
+            const blinkSpeed = 500; // Time in milliseconds for blink effect
+
+            canvas.width = size;
+            canvas.height = size;
+
+            document.head.appendChild(canvas); // Append canvas to head
+
+            const drawFavicon = () => {
+                ctx.clearRect(0, 0, size, size);  // Clear previous drawing
+
+                // Set font and text style
+                ctx.fillStyle = color;
+                ctx.font = '24px "Black Ops One", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(':', size / 2, size / 2); // Draw colon symbol at the center
+            };
+
+            // Create an interval to update the favicon every "blinkSpeed" milliseconds
+            let isVisible = true;
+            setInterval(() => {
+                if (isVisible) {
+                    drawFavicon(); // Draw the colon
+                } else {
+                    ctx.clearRect(0, 0, size, size); // Clear the canvas to hide it
+                }
+                isVisible = !isVisible; // Toggle visibility
+            }, blinkSpeed);
+
+            // Set favicon to the canvas image
+            const favicon = document.createElement('link');
+            favicon.rel = 'icon';
+            favicon.href = canvas.toDataURL('image/png');  // Get image data from canvas
+            document.head.appendChild(favicon);
+        }
+
+        // Call createFavicon function to start the animation
+        createFavicon();
+    </script>
+
 </head>
 <body>
 
