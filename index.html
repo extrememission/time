@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Oswald&display=swap" rel="stylesheet">
     <title>SHQ Time</title>
     <style>
         /* Full-screen background for the page */
@@ -14,7 +14,7 @@
             align-items: center;
             height: 100vh; /* Full viewport height */
             margin: 0; /* Remove default margin */
-            font-family: 'Black Ops One', sans-serif;
+            font-family: 'Black Ops One', sans-serif; /* Time font */
             background-color: black;
             color: #0a3e1e;
             overflow: hidden;
@@ -35,11 +35,13 @@
             font-size: 15vw; /* Set the font size dynamically based on viewport width */
         }
 
+        /* Date Container */
         #date-container {
             position: absolute;
-            top: 50%; /* Reduced distance between time and date */
+            top: 55%; /* Adjusted for consistent spacing between time and date */
             left: 50%;
             transform: translateX(-50%);
+            font-family: 'Oswald', sans-serif; /* Date font */
             font-size: 5vw; /* Smaller font for the date */
             letter-spacing: 0.05em;
         }
