@@ -94,9 +94,9 @@
     <!-- Inline Manifest JSON -->
     <script>
         const manifest = {
-            "name": "SHQ Time",
-            "short_name": "SHQ",
-            "description": "A simple time and date display app",
+            "name": "Redeem Time",
+            "short_name": "Redeem Time",
+            "description": "Redeeming the time, because the days are evil. —Ephesians 5:16",
             "start_url": "/",
             "display": "standalone",
             "background_color": "#000000",
@@ -127,12 +127,11 @@
     </script>
 
 <script>
-    // Function to create a simple "T" favicon with black background and no circle
     function createFavicon() {
         const svg = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
                 <rect width="100%" height="100%" fill="black"/>
-                <text x="50%" y="50%" font-family="Black Ops One, sans-serif" font-size="24" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">T</text>
+                <text x="50%" y="50%" font-family="Black Ops One, sans-serif" font-size="36" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">T</text>
             </svg>
         `;
         const favicon = document.createElement('link');
@@ -143,6 +142,7 @@
 
     createFavicon();
 </script>
+
 
 </head>
 <body>
