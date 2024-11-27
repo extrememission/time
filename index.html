@@ -44,10 +44,10 @@
         }
 
         #time-container {
-            font-size: min(15vw, 20vh, 10rem); /* Ensures time doesn't go off-screen */
+            font-size: min(15vw, 20vh, 10rem);
             max-width: 100%;
             overflow: hidden;
-            margin: 20px 0;  /* Set fixed margin of 20px above and below the time */
+            margin: 20px 0;
         }
 
         #date-container {
@@ -55,7 +55,7 @@
             font-size: 3vw;
             letter-spacing: 0.05em;
             color: #0a3e1e;
-            margin-top: 20px;  /* Fixed margin of 20px between time and date */
+            margin-top: 20px;
         }
 
         h1 {
@@ -79,7 +79,7 @@
                 font-size: 6vw;
             }
             #time-container {
-                font-size: 18vw; /* Adjusted size to prevent overflow on small screens */
+                font-size: 18vw; 
             }
             #date-container {
                 font-size: 4vw;
@@ -114,25 +114,17 @@
     <!-- Inline Manifest JSON -->
     <script>
         const manifest = {
-            "name": "Redeem Time",
-            "short_name": "Redeem Time",
-            "description": "Redeeming the time, because the days are evil. —Ephesians 5:16",
-            "start_url": "/",
-            "display": "standalone",
-            "background_color": "#000000",
-            "theme_color": "#0a3e1e",
-            "icons": [
-                {
-                    "src": "data:image/png;base64,...",  // Base64 encoded 192x192 icon
-                    "sizes": "192x192",
-                    "type": "image/png"
-                },
-                {
-                    "src": "data:image/png;base64,...",  // Base64 encoded 512x512 icon
-                    "sizes": "512x512",
-                    "type": "image/png"
-                }
-            ]
+          "name": "Redeem Time",
+          "short_name": "Redeem Time",
+          "description": "Redeeming the time, because the days are evil. —Ephesians 5:16",
+          "start_url": "/",
+          "display": "standalone",
+          "background_color": "#000000",
+          "theme_color": "#0a3e1e",
+          "icons": [
+              { "src": "data:image/png;base64,...", "sizes": "192x192", "type": "image/png" },
+              { "src": "data:image/png;base64,...", "sizes": "512x512", "type": "image/png" }
+          ]
         };
 
         const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
@@ -146,90 +138,101 @@
 
     <script>
         function createFavicon() {
-            const svg = `    
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
-                    <rect width="100%" height="100%" fill="black"/>
-                    <text x="50%" y="50%" font-family="Black Ops One, sans-serif" font-size="36" fill="white" text-anchor="middle" dominant-baseline="middle">T</text>
-                </svg>
-            `;
-            const favicon = document.createElement('link');
-            favicon.rel = 'icon';
-            favicon.href = 'data:image/svg+xml;base64,' + btoa(svg);
-            document.head.appendChild(favicon);
-        }
+          const svg = `
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+                  <rect width="100%" height="100%" fill="black"/>
+                  <text x="50%" y="50%" font-family="Black Ops One, sans-serif" font-size="36" fill="white" text-anchor="middle" dominant-baseline="middle">T</text>
+              </svg>
+          `;
+          const favicon = document.createElement('link');
+          favicon.rel = 'icon';
+          favicon.href = 'data:image/svg+xml;base64,' + btoa(svg);
+          document.head.appendChild(favicon);
+      }
 
-        createFavicon();
+      createFavicon();
     </script>
 </head>
 <body>
     <div id="content-wrapper">
         <div id="header-text">REDEEMING THE TIME</div>
         <div id="time-container">
-            <h1>
-                <span id="hours"></span><span class="blink">:</span><span id="minutes"></span>
-            </h1>
-        </div>
-        <div id="date-container">
-            <span id="date"></span>
-        </div>
-    </div>
+           <h1>
+               <span id="hours"></span><span class="blink">:</span><span id="minutes"></span>
+           </h1>
+       </div>
+       <div id="date-container">
+           <span id="date"></span>
+       </div>
+   </div>
 
-    <script>
-        function updateTime() {
-            const now = new Date();
-            let hours = now.getHours();
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            hours = hours % 12 || 12;
-            document.getElementById('hours').textContent = hours;
-            document.getElementById('minutes').textContent = minutes;
+   <script>
+       function updateTime() {
+           const now = new Date();
+           let hours = now.getHours();
+           const minutes = now.getMinutes().toString().padStart(2, '0');
+           hours = hours % 12 || 12; // Convert to 12-hour format
+           document.getElementById('hours').textContent = hours;
+           document.getElementById('minutes').textContent = minutes;
 
-            const date = now.toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            document.getElementById('date').textContent = date;
-        }
+           const date = now.toLocaleDateString('en-US', {
+               weekday: 'long',
+               year: 'numeric',
+               month: 'long',
+               day: 'numeric'
+           });
+           document.getElementById('date').textContent = date;
 
-        updateTime();
-        setInterval(updateTime, 500);
-    </script>
+           adjustFontSize(); // Adjust the font size
+       }
 
-    <script>
-        if ('serviceWorker' in navigator) {
-            const serviceWorkerScript = `
-                self.addEventListener('install', (event) => {
-                    event.waitUntil(
-                        caches.open('my-cache').then((cache) => {
-                            return cache.addAll([
-                                '/',
-                                '/manifest.json',
-                                '/icons/icon-192x192.png',
-                                '/icons/icon-512x512.png',
-                            ]);
-                        })
-                    );
-                });
+       function adjustFontSize() {
+           const timeContainer = document.getElementById('time-container');
+           const fontSize = Math.min(window.innerWidth / 10, window.innerHeight / 5);
+           timeContainer.style.fontSize = `${fontSize}px`;
+       }
 
-                self.addEventListener('fetch', (event) => {
-                    event.respondWith(
-                        caches.match(event.request).then((cachedResponse) => {
-                            return cachedResponse || fetch(event.request);
-                        })
-                    );
-                });
-            `;
-            const blob = new Blob([serviceWorkerScript], { type: 'application/javascript' });
-            const serviceWorkerURL = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(serviceWorkerURL)
-                .then(registration => {
-                    console.log('Service Worker registered with the Blob URL:', registration.scope);
-                })
-                .catch(error => {
-                    console.log('Service Worker registration failed:', error);
-                });
-        }
-    </script>
+       // Initial call to set the time and adjust font size
+       updateTime();
+
+       // Update time and adjust font size every second
+       setInterval(updateTime, 500);
+
+       // Adjust font size on window resize or orientation change
+       window.addEventListener('resize', adjustFontSize);
+       window.addEventListener('orientationchange', adjustFontSize);
+   </script>
+
+   <script>
+       if ('serviceWorker' in navigator) {
+           const serviceWorkerScript = `
+               self.addEventListener('install', (event) => {
+                   event.waitUntil(
+                       caches.open('my-cache').then((cache) => {
+                           return cache.addAll([
+                               '/',
+                               '/manifest.json',
+                               '/icons/icon-192x192.png',
+                               '/icons/icon-512x512.png',
+                           ]);
+                       })
+                   );
+               });
+
+               self.addEventListener('fetch', (event) => {
+                   event.respondWith(
+                       caches.match(event.request).then((cachedResponse) => {
+                           return cachedResponse || fetch(event.request);
+                       })
+                   );
+               });
+           `;
+           const blob = new Blob([serviceWorkerScript], { type:'application/javascript' });
+           const serviceWorkerURL = URL.createObjectURL(blob);
+           navigator.serviceWorker.register(serviceWorkerURL)
+               .then(registration => console.log('Service Worker registered with scope:', registration.scope))
+               .catch(error => console.log('Service Worker registration failed:', error));
+       }
+   </script>
 </body>
 </html>
