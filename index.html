@@ -2,114 +2,114 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Oswald&display=swap" rel="stylesheet">
     <meta name="theme-color" content="#0a3e1e">
     <meta name="description" content="Redeeming the time because the days are evil">
     <title>Redeeming the Time</title>
 
-<style>
-    body {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        font-family: 'Black Ops One', sans-serif;
-        background-color: black;
-        color: #0a3e1e;
-        overflow: hidden;
-        position: relative;
-        text-align: center;
-    }
-
-    #content-wrapper {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-        width: 100%;
-    }
-
-    #header-text {
-        font-family: 'Oswald', sans-serif;
-        font-size: 5vw;
-        letter-spacing: 0.3em;
-        text-transform: uppercase;
-        color: #0a3e1e;
-        margin-bottom: 2vh;
-        white-space: nowrap;
-    }
-
-    #time-container {
-        font-size: min(15vw, 20vh, 10rem);
-        max-width: 100%;
-        overflow: hidden;
-        margin: 20px 0;  /* Set fixed margin of 20px above and below the time */
-    }
-
-    #date-container {
-        font-family: 'Oswald', sans-serif;
-        font-size: 3vw;
-        letter-spacing: 0.05em;
-        color: #0a3e1e;
-        margin-top: 20px;  /* Fixed margin of 20px between time and date */
-    }
-
-    h1 {
-        margin: 0;
-        line-height: 1;
-        letter-spacing: 0.1em;
-    }
-
-    .blink {
-        animation: blink-animation 1s steps(1) infinite;
-    }
-
-    @keyframes blink-animation {
-        50% {
-            visibility: hidden;
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Black Ops One', sans-serif;
+            background-color: black;
+            color: #0a3e1e;
+            overflow: hidden;
+            position: relative;
+            text-align: center;
         }
-    }
 
-    @media (max-width: 600px) {
+        #content-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+        }
+
         #header-text {
-            font-size: 6vw;
+            font-family: 'Oswald', sans-serif;
+            font-size: 5vw;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: #0a3e1e;
+            margin-bottom: 2vh;
+            white-space: nowrap;
         }
-        #time-container {
-            font-size: 20vw;
-        }
-        #date-container {
-            font-size: 4vw;
-        }
-    }
 
-    @media (min-width: 601px) and (max-width: 1024px) {
-        #header-text {
-            font-size: 4vw;
-        }
         #time-container {
-            font-size: 12vw;
+            font-size: min(15vw, 20vh, 10rem); /* Ensures time doesn't go off-screen */
+            max-width: 100%;
+            overflow: hidden;
+            margin: 20px 0;  /* Set fixed margin of 20px above and below the time */
         }
+
         #date-container {
+            font-family: 'Oswald', sans-serif;
             font-size: 3vw;
+            letter-spacing: 0.05em;
+            color: #0a3e1e;
+            margin-top: 20px;  /* Fixed margin of 20px between time and date */
         }
-    }
 
-    @media (min-width: 1025px) {
-        #header-text {
-            font-size: 3vw;
+        h1 {
+            margin: 0;
+            line-height: 1;
+            letter-spacing: 0.1em;
         }
-        #time-container {
-            font-size: 10vw;
+
+        .blink {
+            animation: blink-animation 1s steps(1) infinite;
         }
-        #date-container {
-            font-size: 2vw;
+
+        @keyframes blink-animation {
+            50% {
+                visibility: hidden;
+            }
         }
-    }
-</style>
+
+        @media (max-width: 600px) {
+            #header-text {
+                font-size: 6vw;
+            }
+            #time-container {
+                font-size: 18vw; /* Adjusted size to prevent overflow on small screens */
+            }
+            #date-container {
+                font-size: 4vw;
+            }
+        }
+
+        @media (min-width: 601px) and (max-width: 1024px) {
+            #header-text {
+                font-size: 4vw;
+            }
+            #time-container {
+                font-size: 12vw;
+            }
+            #date-container {
+                font-size: 3vw;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            #header-text {
+                font-size: 3vw;
+            }
+            #time-container {
+                font-size: 10vw;
+            }
+            #date-container {
+                font-size: 2vw;
+            }
+        }
+    </style>
 
     <!-- Inline Manifest JSON -->
     <script>
