@@ -11,7 +11,7 @@
     <style>
         /* Full-screen background for the page */
         body {
-            display flex;
+            display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -23,6 +23,19 @@
             overflow: hidden;
             position: relative;
             text-align: center;
+        }
+
+        /* "REDEEMING THE TIME" text styling */
+        #header-text {
+            position: absolute;
+            top: 20%; /* Positioned near the top of the screen */
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Oswald', sans-serif;
+            font-size: 6vw;
+            letter-spacing: 0.3em; /* Large spacing between characters */
+            text-transform: uppercase;
+            color: white;
         }
 
         #time-container {
@@ -128,7 +141,7 @@
 
 <script>
     function createFavicon() {
-        const svg = `
+        const svg = `    
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
                 <rect width="100%" height="100%" fill="black"/>
                 <text x="50%" y="50%" font-family="Black Ops One, sans-serif" font-size="36" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">T</text>
@@ -143,9 +156,13 @@
     createFavicon();
 </script>
 
-
 </head>
 <body>
+
+    <!-- REDEEMING THE TIME Text -->
+    <div id="header-text">
+        REDEEMING THE TIME
+    </div>
 
     <div id="time-container">
         <h1>
