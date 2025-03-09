@@ -80,10 +80,13 @@
         /* Wake Lock Button Styles */
         #wake-lock-container {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
             z-index: 100;
             display: flex;
+            justify-content: center;
             align-items: center;
         }
 
@@ -91,10 +94,10 @@
             background: none;
             border: 2px solid #0a3e1e;
             color: #0a3e1e;
-            padding: 8px 12px;
+            padding: 5px 10px;
             border-radius: 50px;
             font-family: 'Oswald', sans-serif;
-            font-size: 16px;
+            font-size: 14px;
             cursor: pointer;
             outline: none;
             transition: all 0.3s ease;
@@ -144,12 +147,13 @@
                 font-size: 4vw;
             }
             #wake-lock-toggle {
-                font-size: 14px;
-                padding: 6px 10px;
+                font-size: 12px;
+                padding: 4px 8px;
             }
             #wake-lock-indicator {
-                width: 10px;
-                height: 10px;
+                width: 8px;
+                height: 8px;
+                margin-right: 6px;
             }
         }
 
