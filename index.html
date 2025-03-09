@@ -74,6 +74,58 @@
             }
         }
 
+        /* Wake Lock Button Styles */
+        #wake-lock-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+        }
+
+        #wake-lock-toggle {
+            background: none;
+            border: 2px solid #0a3e1e;
+            color: #0a3e1e;
+            padding: 8px 12px;
+            border-radius: 50px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        #wake-lock-toggle:hover {
+            background-color: rgba(10, 62, 30, 0.2);
+        }
+
+        #wake-lock-toggle.active {
+            background-color: #0a3e1e;
+            color: black;
+        }
+
+        #wake-lock-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #555;
+            margin-right: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        #wake-lock-indicator.active {
+            background-color: #0a3e1e;
+            box-shadow: 0 0 5px #0a3e1e, 0 0 8px #0a3e1e;
+        }
+
+        #wake-lock-indicator.unsupported {
+            background-color: #8B0000;
+        }
+
         @media (max-width: 600px) {
             #header-text {
                 font-size: 6vw;
@@ -83,6 +135,14 @@
             }
             #date-container {
                 font-size: 4vw;
+            }
+            #wake-lock-toggle {
+                font-size: 14px;
+                padding: 6px 10px;
+            }
+            #wake-lock-indicator {
+                width: 10px;
+                height: 10px;
             }
         }
 
@@ -164,75 +224,178 @@
        <div id="date-container">
            <span id="date"></span>
        </div>
-   </div>
+    </div>
 
-   <script>
-       function updateTime() {
-           const now = new Date();
-           let hours = now.getHours();
-           const minutes = now.getMinutes().toString().padStart(2, '0');
-           hours = hours % 12 || 12; // Convert to 12-hour format
-           document.getElementById('hours').textContent = hours;
-           document.getElementById('minutes').textContent = minutes;
+    <!-- Wake Lock Control -->
+    <div id="wake-lock-container">
+        <button id="wake-lock-toggle">
+            <span id="wake-lock-indicator"></span>
+            <span id="wake-lock-text">STAY AWAKE</span>
+        </button>
+    </div>
 
-           const date = now.toLocaleDateString('en-US', {
-               weekday: 'long',
-               year: 'numeric',
-               month: 'long',
-               day: 'numeric'
-           });
-           document.getElementById('date').textContent = date;
+    <script>
+        // Time display logic
+        function updateTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            hours = hours % 12 || 12; // Convert to 12-hour format
+            document.getElementById('hours').textContent = hours;
+            document.getElementById('minutes').textContent = minutes;
 
-           adjustFontSize(); // Adjust the font size
-       }
+            const date = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('date').textContent = date;
 
-       function adjustFontSize() {
-           const timeContainer = document.getElementById('time-container');
-           const fontSize = Math.min(window.innerWidth / 10, window.innerHeight / 5);
-           timeContainer.style.fontSize = `${fontSize}px`;
-       }
+            adjustFontSize(); // Adjust the font size
+        }
 
-       // Initial call to set the time and adjust font size
-       updateTime();
+        function adjustFontSize() {
+            const timeContainer = document.getElementById('time-container');
+            const fontSize = Math.min(window.innerWidth / 10, window.innerHeight / 5);
+            timeContainer.style.fontSize = `${fontSize}px`;
+        }
 
-       // Update time and adjust font size every second
-       setInterval(updateTime, 500);
+        // Initial call to set the time and adjust font size
+        updateTime();
 
-       // Adjust font size on window resize or orientation change
-       window.addEventListener('resize', adjustFontSize);
-       window.addEventListener('orientationchange', adjustFontSize);
-   </script>
+        // Update time and adjust font size every second
+        setInterval(updateTime, 500);
 
-   <script>
-       if ('serviceWorker' in navigator) {
-           const serviceWorkerScript = `
-               self.addEventListener('install', (event) => {
-                   event.waitUntil(
-                       caches.open('my-cache').then((cache) => {
-                           return cache.addAll([
-                               '/',
-                               '/manifest.json',
-                               '/icons/icon-192x192.png',
-                               '/icons/icon-512x512.png',
-                           ]);
-                       })
-                   );
-               });
+        // Adjust font size on window resize or orientation change
+        window.addEventListener('resize', adjustFontSize);
+        window.addEventListener('orientationchange', adjustFontSize);
 
-               self.addEventListener('fetch', (event) => {
-                   event.respondWith(
-                       caches.match(event.request).then((cachedResponse) => {
-                           return cachedResponse || fetch(event.request);
-                       })
-                   );
-               });
-           `;
-           const blob = new Blob([serviceWorkerScript], { type:'application/javascript' });
-           const serviceWorkerURL = URL.createObjectURL(blob);
-           navigator.serviceWorker.register(serviceWorkerURL)
-               .then(registration => console.log('Service Worker registered with scope:', registration.scope))
-               .catch(error => console.log('Service Worker registration failed:', error));
-       }
-   </script>
+        // Wake Lock API integration
+        const wakeLockToggle = document.getElementById('wake-lock-toggle');
+        const wakeLockIndicator = document.getElementById('wake-lock-indicator');
+        const wakeLockText = document.getElementById('wake-lock-text');
+        
+        // Variable to store the wake lock object
+        let wakeLock = null;
+        
+        // Check if the Wake Lock API is supported
+        const isWakeLockSupported = () => {
+            return 'wakeLock' in navigator;
+        };
+
+        // Request a wake lock
+        const requestWakeLock = async () => {
+            if (!isWakeLockSupported()) {
+                console.error('Wake Lock API is not supported in this browser.');
+                wakeLockIndicator.classList.add('unsupported');
+                wakeLockText.textContent = 'NOT SUPPORTED';
+                return false;
+            }
+            
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+                
+                // Add event listener for when wake lock is released
+                wakeLock.addEventListener('release', () => {
+                    console.log('Wake Lock was released');
+                    updateWakeLockUI(false);
+                });
+                
+                updateWakeLockUI(true);
+                console.log('Wake Lock is active');
+                return true;
+            } catch (err) {
+                console.error(`Failed to request wake lock: ${err.message}`);
+                updateWakeLockUI(false);
+                return false;
+            }
+        };
+
+        // Release the wake lock
+        const releaseWakeLock = async () => {
+            if (wakeLock) {
+                try {
+                    await wakeLock.release();
+                    wakeLock = null;
+                    console.log('Wake Lock released');
+                } catch (err) {
+                    console.error(`Failed to release wake lock: ${err.message}`);
+                }
+            }
+            updateWakeLockUI(false);
+        };
+
+        // Update UI to reflect wake lock status
+        const updateWakeLockUI = (isActive) => {
+            if (isActive) {
+                wakeLockToggle.classList.add('active');
+                wakeLockIndicator.classList.add('active');
+                wakeLockText.textContent = 'STAYING AWAKE';
+            } else {
+                wakeLockToggle.classList.remove('active');
+                wakeLockIndicator.classList.remove('active');
+                wakeLockText.textContent = 'STAY AWAKE';
+            }
+        };
+
+        // Add event listener to toggle wake lock
+        wakeLockToggle.addEventListener('click', async () => {
+            if (wakeLock) {
+                await releaseWakeLock();
+            } else {
+                await requestWakeLock();
+            }
+        });
+
+        // Check wake lock support on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!isWakeLockSupported()) {
+                wakeLockIndicator.classList.add('unsupported');
+                wakeLockText.textContent = 'NOT SUPPORTED';
+                wakeLockToggle.disabled = true;
+                console.warn('Wake Lock API is not supported in this browser.');
+            }
+        });
+
+        // Re-request wake lock when page becomes visible again
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                await requestWakeLock();
+            }
+        });
+    </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            const serviceWorkerScript = `
+                self.addEventListener('install', (event) => {
+                    event.waitUntil(
+                        caches.open('my-cache').then((cache) => {
+                            return cache.addAll([
+                                '/',
+                                '/manifest.json',
+                                '/icons/icon-192x192.png',
+                                '/icons/icon-512x512.png',
+                            ]);
+                        })
+                    );
+                });
+
+                self.addEventListener('fetch', (event) => {
+                    event.respondWith(
+                        caches.match(event.request).then((cachedResponse) => {
+                            return cachedResponse || fetch(event.request);
+                        })
+                    );
+                });
+            `;
+            const blob = new Blob([serviceWorkerScript], { type:'application/javascript' });
+            const serviceWorkerURL = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(serviceWorkerURL)
+                .then(registration => console.log('Service Worker registered with scope:', registration.scope))
+                .catch(error => console.log('Service Worker registration failed:', error));
+        }
+    </script>
 </body>
 </html>
