@@ -121,8 +121,12 @@
         }
 
         #wake-lock-indicator.active {
-            background-color: #0a3e1e;
-            box-shadow: 0 0 5px #0a3e1e, 0 0 8px #0a3e1e;
+            background-color: #2bff4a; /* Brighter green */
+            box-shadow: 0 0 5px #2bff4a, 0 0 8px #2bff4a;
+        }
+        
+        #wake-lock-indicator.active.blink {
+            animation: blink-animation 1s steps(1) infinite;
         }
 
         #wake-lock-indicator.unsupported {
@@ -441,6 +445,8 @@
             if (isActive) {
                 wakeLockToggle.classList.add('active');
                 wakeLockIndicator.classList.add('active');
+                // Add blinking effect to the indicator
+                wakeLockIndicator.classList.add('blink');
                 
                 // Use different text for iOS
                 if (isIOS() && videoElement) {
@@ -451,6 +457,8 @@
             } else {
                 wakeLockToggle.classList.remove('active');
                 wakeLockIndicator.classList.remove('active');
+                // Remove blinking effect
+                wakeLockIndicator.classList.remove('blink');
                 wakeLockText.textContent = 'STAY AWAKE';
             }
         };
