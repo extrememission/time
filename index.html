@@ -77,8 +77,8 @@
             }
         }
 
-        /* Wake Lock Button Styles */
-        #wake-lock-container {
+        /* Stay Awake Button Styles */
+        #stay-awake-container {
             position: fixed;
             bottom: 20px;
             left: 0;
@@ -90,7 +90,7 @@
             align-items: center;
         }
 
-        #wake-lock-toggle {
+        #stay-awake-toggle {
             background: none;
             border: 2px solid #0a3e1e;
             color: #0a3e1e;
@@ -105,16 +105,16 @@
             align-items: center;
         }
 
-        #wake-lock-toggle:hover {
+        #stay-awake-toggle:hover {
             background-color: rgba(10, 62, 30, 0.2);
         }
 
-        #wake-lock-toggle.active {
+        #stay-awake-toggle.active {
             background-color: #0a3e1e;
             color: black;
         }
 
-        #wake-lock-indicator {
+        #stay-awake-indicator {
             width: 12px;
             height: 12px;
             border-radius: 50%;
@@ -123,17 +123,32 @@
             transition: background-color 0.3s ease;
         }
 
-        #wake-lock-indicator.active {
+        #stay-awake-indicator.active {
             background-color: #2bff4a; /* Brighter green */
             box-shadow: 0 0 5px #2bff4a, 0 0 8px #2bff4a;
         }
         
-        #wake-lock-indicator.active.blink {
+        #stay-awake-indicator.active.blink {
             animation: blink-animation 1s steps(1) infinite;
         }
 
-        #wake-lock-indicator.unsupported {
-            background-color: #8B0000;
+        /* Hidden video styles */
+        #video-container {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            width: 1px;
+            height: 1px;
+            z-index: -9999;
+            overflow: hidden;
+        }
+
+        #awake-video {
+            position: absolute;
+            opacity: 0.0001;
+            pointer-events: none;
         }
 
         @media (max-width: 600px) {
@@ -146,11 +161,11 @@
             #date-container {
                 font-size: 4vw;
             }
-            #wake-lock-toggle {
+            #stay-awake-toggle {
                 font-size: 12px;
                 padding: 4px 8px;
             }
-            #wake-lock-indicator {
+            #stay-awake-indicator {
                 width: 8px;
                 height: 8px;
                 margin-right: 6px;
@@ -237,11 +252,18 @@
        </div>
     </div>
 
-    <!-- Wake Lock Control -->
-    <div id="wake-lock-container">
-        <button id="wake-lock-toggle">
-            <span id="wake-lock-indicator"></span>
-            <span id="wake-lock-text">STAY AWAKE</span>
+    <!-- Hidden Video for Stay Awake Functionality -->
+    <div id="video-container">
+        <video id="awake-video" playsinline muted loop>
+            <source src="/awake.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- Stay Awake Control -->
+    <div id="stay-awake-container">
+        <button id="stay-awake-toggle">
+            <span id="stay-awake-indicator"></span>
+            <span id="stay-awake-text">STAY AWAKE</span>
         </button>
     </div>
 
@@ -282,218 +304,125 @@
         window.addEventListener('resize', adjustFontSize);
         window.addEventListener('orientationchange', adjustFontSize);
 
-        // Wake Lock API integration
-        const wakeLockToggle = document.getElementById('wake-lock-toggle');
-        const wakeLockIndicator = document.getElementById('wake-lock-indicator');
-        const wakeLockText = document.getElementById('wake-lock-text');
+        // Stay Awake functionality using the video
+        const stayAwakeToggle = document.getElementById('stay-awake-toggle');
+        const stayAwakeIndicator = document.getElementById('stay-awake-indicator');
+        const stayAwakeText = document.getElementById('stay-awake-text');
+        const awakeVideo = document.getElementById('awake-video');
         
-        // Variable to store the wake lock object
-        let wakeLock = null;
+        // Track awake state
+        let isAwake = false;
         
-        // iOS detection
-        const isIOS = () => {
-            return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        };
-
-        // Video element for iOS fallback
-        let videoElement = null;
-
-        // Check if the Wake Lock API is supported
-        const isWakeLockSupported = () => {
-            return 'wakeLock' in navigator;
-        };
-
-        // Create a proper HTML video element with base64 encoded video directly in HTML
-        const createIOSVideoFallback = () => {
-            if (videoElement) return; // Already created
-            
-            // Create div container for video
-            const videoContainer = document.createElement('div');
-            videoContainer.style.position = 'fixed';
-            videoContainer.style.right = '0';
-            videoContainer.style.bottom = '0';
-            videoContainer.style.width = '1px';
-            videoContainer.style.height = '1px';
-            videoContainer.style.zIndex = '-1';
-            videoContainer.style.pointerEvents = 'none';
-            
-            // Create the video element with inline attributes for iOS
-            videoElement = document.createElement('video');
-            
-            // These attributes are critical for iOS autoplay
-            videoElement.playsInline = true;  
-            videoElement.muted = true;
-            videoElement.autoplay = true;
-            videoElement.loop = true;
-            videoElement.setAttribute('playsinline', '');
-            videoElement.setAttribute('webkit-playsinline', '');
-            videoElement.setAttribute('muted', '');
-            videoElement.setAttribute('autoplay', '');
-            videoElement.setAttribute('loop', '');
-            
-            // Style to make it non-intrusive
-            videoElement.style.width = '1px';
-            videoElement.style.height = '1px';
-            videoElement.style.opacity = '0.001';
-            
-            // Create a source with a minimal silent video 
-            // This is a 1x1 pixel black mp4 video with no audio track
-            const source = document.createElement('source');
-            source.src = '/static/silent.mp4';
-            source.type = 'video/mp4';
-            
-            videoElement.appendChild(source);
-            videoContainer.appendChild(videoElement);
-            document.body.appendChild(videoContainer);
-            
-            // Play the video - important to handle user interaction requirement
-            const playVideo = () => {
-                videoElement.play()
+        // Start the stay awake functionality
+        const startStayAwake = () => {
+            try {
+                // Play the video to keep the screen awake
+                awakeVideo.play()
                     .then(() => {
-                        console.log('iOS video playing successfully');
-                        // Success - can remove the event listener
-                        document.removeEventListener('touchstart', playVideo);
-                        document.removeEventListener('click', playVideo);
+                        console.log('Stay awake video playing successfully');
+                        isAwake = true;
+                        updateStayAwakeUI(true);
+                        
+                        // Set up a keep-alive interval to restart video if needed
+                        if (!window.keepAliveInterval) {
+                            window.keepAliveInterval = setInterval(() => {
+                                if (isAwake && (awakeVideo.paused || awakeVideo.ended)) {
+                                    console.log('Restarting video');
+                                    awakeVideo.play().catch(e => {
+                                        console.error('Error restarting video:', e);
+                                    });
+                                }
+                            }, 1000);
+                        }
                     })
                     .catch(e => {
-                        console.error('iOS video fallback error:', e);
+                        console.error('Failed to play stay awake video:', e);
+                        // Try to play on user interaction when autoplay fails
+                        isAwake = false;
+                        updateStayAwakeUI(false);
                     });
+            } catch (err) {
+                console.error('Error enabling stay awake mode:', err);
+                isAwake = false;
+                updateStayAwakeUI(false);
+            }
+        };
+        
+        // Stop the stay awake functionality
+        const stopStayAwake = () => {
+            try {
+                // Pause the video
+                awakeVideo.pause();
+                
+                // Clear the keep-alive interval
+                if (window.keepAliveInterval) {
+                    clearInterval(window.keepAliveInterval);
+                    window.keepAliveInterval = null;
+                }
+                
+                isAwake = false;
+                updateStayAwakeUI(false);
+                console.log('Stay awake mode stopped');
+            } catch (err) {
+                console.error('Error disabling stay awake mode:', err);
+            }
+        };
+
+        // Update UI to reflect stay awake status
+        const updateStayAwakeUI = (isActive) => {
+            if (isActive) {
+                stayAwakeToggle.classList.add('active');
+                stayAwakeIndicator.classList.add('active');
+                stayAwakeIndicator.classList.add('blink');
+                stayAwakeText.textContent = 'STAYING AWAKE';
+            } else {
+                stayAwakeToggle.classList.remove('active');
+                stayAwakeIndicator.classList.remove('active');
+                stayAwakeIndicator.classList.remove('blink');
+                stayAwakeText.textContent = 'STAY AWAKE';
+            }
+        };
+
+        // Add event listener to toggle stay awake
+        stayAwakeToggle.addEventListener('click', () => {
+            if (isAwake) {
+                stopStayAwake();
+            } else {
+                startStayAwake();
+            }
+        });
+
+        // Initialize autoplay attempt on first user interaction
+        const attemptAutoplayOnUserInteraction = () => {
+            // Setup one-time event listeners for first interaction
+            const handleFirstInteraction = () => {
+                // Pre-load and prepare the video for future use
+                awakeVideo.load();
+                console.log('Video preloaded after user interaction');
+                
+                // Clean up event listeners
+                document.removeEventListener('touchstart', handleFirstInteraction);
+                document.removeEventListener('click', handleFirstInteraction);
             };
             
-            // Try to play immediately
-            playVideo();
-            
-            // Also attempt playback on first user interaction (iOS often requires this)
-            document.addEventListener('touchstart', playVideo, { once: true });
-            document.addEventListener('click', playVideo, { once: true });
-            
-            // Keep alive - recreate video if it stops
-            setInterval(() => {
-                if (videoElement && 
-                    (videoElement.paused || videoElement.ended || !videoElement.currentTime)) {
-                    console.log('Restarting iOS video');
-                    playVideo();
-                }
-            }, 1000);
+            document.addEventListener('touchstart', handleFirstInteraction, { once: true });
+            document.addEventListener('click', handleFirstInteraction, { once: true });
         };
 
-        // Request a wake lock
-        const requestWakeLock = async () => {
-            // iOS fallback
-            if (isIOS()) {
-                console.log('iOS detected, using video fallback');
-                createIOSVideoFallback();
-                updateWakeLockUI(true);
-                return true;
-            }
-            
-            // Standard Wake Lock API
-            if (!isWakeLockSupported()) {
-                console.error('Wake Lock API is not supported in this browser.');
-                wakeLockIndicator.classList.add('unsupported');
-                wakeLockText.textContent = 'NOT SUPPORTED';
-                return false;
-            }
-            
-            try {
-                wakeLock = await navigator.wakeLock.request('screen');
-                
-                // Add event listener for when wake lock is released
-                wakeLock.addEventListener('release', () => {
-                    console.log('Wake Lock was released');
-                    updateWakeLockUI(false);
-                });
-                
-                updateWakeLockUI(true);
-                console.log('Wake Lock is active');
-                return true;
-            } catch (err) {
-                console.error(`Failed to request wake lock: ${err.message}`);
-                updateWakeLockUI(false);
-                return false;
-            }
-        };
-
-        // Release the wake lock
-        const releaseWakeLock = async () => {
-            // Handle iOS video fallback
-            if (isIOS() && videoElement) {
-                try {
-                    videoElement.pause();
-                    videoElement.remove();
-                    videoElement = null;
-                    console.log('iOS video fallback stopped');
-                } catch (err) {
-                    console.error(`Failed to stop iOS fallback: ${err.message}`);
-                }
-                updateWakeLockUI(false);
-                return;
-            }
-            
-            // Standard wake lock release
-            if (wakeLock) {
-                try {
-                    await wakeLock.release();
-                    wakeLock = null;
-                    console.log('Wake Lock released');
-                } catch (err) {
-                    console.error(`Failed to release wake lock: ${err.message}`);
-                }
-            }
-            updateWakeLockUI(false);
-        };
-
-        // Update UI to reflect wake lock status
-        const updateWakeLockUI = (isActive) => {
-            if (isActive) {
-                wakeLockToggle.classList.add('active');
-                wakeLockIndicator.classList.add('active');
-                // Add blinking effect to the indicator
-                wakeLockIndicator.classList.add('blink');
-                
-                // Use different text for iOS
-                if (isIOS() && videoElement) {
-                    wakeLockText.textContent = 'STAYING AWAKE (iOS)';
-                } else {
-                    wakeLockText.textContent = 'STAYING AWAKE';
-                }
-            } else {
-                wakeLockToggle.classList.remove('active');
-                wakeLockIndicator.classList.remove('active');
-                // Remove blinking effect
-                wakeLockIndicator.classList.remove('blink');
-                wakeLockText.textContent = 'STAY AWAKE';
-            }
-        };
-
-        // Add event listener to toggle wake lock
-        wakeLockToggle.addEventListener('click', async () => {
-            if (wakeLock) {
-                await releaseWakeLock();
-            } else {
-                await requestWakeLock();
-            }
-        });
-
-        // Check wake lock support on page load
+        // Set up events when the page is loaded
         document.addEventListener('DOMContentLoaded', () => {
-            if (isIOS()) {
-                // iOS devices get the video fallback
-                console.log('iOS device detected, fallback will be used');
-            } else if (!isWakeLockSupported()) {
-                // Other non-supporting browsers
-                wakeLockIndicator.classList.add('unsupported');
-                wakeLockText.textContent = 'NOT SUPPORTED';
-                wakeLockToggle.disabled = true;
-                console.warn('Wake Lock API is not supported in this browser.');
-            }
+            // Initialize UI
+            updateStayAwakeUI(false);
+            
+            // Prepare video for autoplay on first interaction
+            attemptAutoplayOnUserInteraction();
         });
 
-        // Re-request wake lock when page becomes visible again
-        document.addEventListener('visibilitychange', async () => {
-            if (wakeLock !== null && document.visibilityState === 'visible') {
-                await requestWakeLock();
+        // Re-enable stay awake when the page becomes visible again
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && isAwake) {
+                // Restart the video if it was playing
+                startStayAwake();
             }
         });
     </script>
@@ -507,8 +436,7 @@
                             return cache.addAll([
                                 '/',
                                 '/manifest.json',
-                                '/icons/icon-192x192.png',
-                                '/icons/icon-512x512.png',
+                                '/awake.mp4'
                             ]);
                         })
                     );
