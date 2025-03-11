@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Oswald&display=swap" rel="stylesheet">
-    <meta name="theme-color" content="#0a3e1e">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#ff0000">
     <meta name="description" content="Redeeming the time because the days are evil">
     <title>Redeeming the Time</title>
     <!-- iOS Meta Tags -->
@@ -19,12 +19,13 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            font-family: 'Oswald', sans-serif;
+            font-family: 'Share Tech Mono', monospace;
             background-color: black;
-            color: #0a3e1e;
+            color: #ff0000; /* Aviation red - preserves night vision */
             overflow: hidden;
             position: relative;
             text-align: center;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,1) 100%); /* Subtle gradient for windshield effect */
         }
 
         #content-wrapper {
@@ -34,19 +35,46 @@
             align-items: center;
             height: 100%;
             width: 100%;
+            position: relative;
+        }
+        
+        /* Add some military-style design elements */
+        #content-wrapper::before {
+            content: "";
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            height: 30px;
+            width: 30px;
+            border-top: 2px solid #ff0000;
+            border-left: 2px solid #ff0000;
+        }
+        
+        #content-wrapper::after {
+            content: "";
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            height: 30px;
+            width: 30px;
+            border-bottom: 2px solid #ff0000;
+            border-right: 2px solid #ff0000;
         }
 
         #header-text {
-            font-family: 'Oswald', sans-serif;
+            font-family: 'Share Tech Mono', monospace;
             font-size: 5vw;
-            letter-spacing: 0.3em;
+            letter-spacing: 0.2em;
             text-transform: uppercase;
-            color: #0a3e1e;
+            color: #ff0000; /* Aviation red - preserves night vision */
             margin-bottom: 2vh;
             white-space: nowrap;
+            border-bottom: 1px solid #ff0000;
+            padding-bottom: 0.5vh;
         }
 
         #time-container {
+            font-family: 'Share Tech Mono', monospace;
             font-size: min(15vw, 20vh, 10rem);
             max-width: 100%;
             overflow: hidden;
@@ -54,11 +82,48 @@
         }
 
         #date-container {
-            font-family: 'Oswald', sans-serif;
+            font-family: 'Share Tech Mono', monospace;
             font-size: 20vw;
             letter-spacing: 0.05em;
-            color: #0a3e1e;
+            color: #ff0000; /* Aviation red - preserves night vision */
             margin-top: 10px;
+            text-transform: uppercase;
+        }
+        
+        /* HUD Container Layout */
+        #hud-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100%;
+            position: relative;
+        }
+        
+        /* Mirror toggle button styling */
+        #mirror-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(255, 0, 0, 0.2);
+            border: 1px solid #ff0000;
+            color: #ff0000;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 8px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            z-index: 100;
+            transition: background-color 0.3s;
+        }
+        
+        #mirror-toggle:hover {
+            background-color: rgba(255, 0, 0, 0.4);
+        }
+        
+        /* Mirror mode class */
+        .mirror-mode {
+            transform: scale(-1, 1); /* Horizontal mirror effect */
         }
 
         h1 {
@@ -123,7 +188,7 @@
           "start_url": "/",
           "display": "standalone",
           "background_color": "#000000",
-          "theme_color": "#0a3e1e",
+          "theme_color": "#ff0000",
           "icons": [
               { "src": "data:image/png;base64,...", "sizes": "192x192", "type": "image/png" },
               { "src": "data:image/png;base64,...", "sizes": "512x512", "type": "image/png" }
@@ -144,7 +209,7 @@
           const svg = `
               <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
                   <rect width="100%" height="100%" fill="black"/>
-                  <text x="50%" y="50%" font-family="Black Ops One, sans-serif" font-size="36" fill="white" text-anchor="middle" dominant-baseline="middle">T</text>
+                  <text x="50%" y="50%" font-family="Share Tech Mono, monospace" font-size="36" fill="#ff0000" text-anchor="middle" dominant-baseline="middle">T</text>
               </svg>
           `;
           const favicon = document.createElement('link');
@@ -157,17 +222,22 @@
     </script>
 </head>
 <body>
-    <div id="content-wrapper">
-        <div id="header-text">REDEEMING THE TIME</div>
-        <div id="time-container">
-           <h1>
-               <span id="hours"></span><span class="blink">:</span><span id="minutes"></span>
-           </h1>
-       </div>
-       <div id="date-container">
-           <span id="date"></span>
-       </div>
+    <div id="hud-container">
+        <div id="content-wrapper">
+            <div id="header-text">REDEEMING THE TIME</div>
+            <div id="time-container">
+                <h1>
+                    <span id="hours"></span><span class="blink">:</span><span id="minutes"></span>
+                </h1>
+            </div>
+            <div id="date-container">
+                <span id="date"></span>
+            </div>
+        </div>
     </div>
+    
+    <!-- Toggle button for mirroring -->
+    <button id="mirror-toggle" title="Toggle HUD Mirror Mode">MIRROR</button>
 
     <script>
         // Time display logic
@@ -175,16 +245,21 @@
             const now = new Date();
             let hours = now.getHours();
             const minutes = now.getMinutes().toString().padStart(2, '0');
-            hours = hours % 12 || 12; // Convert to 12-hour format
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            hours = hours.toString().padStart(2, '0');
+            
+            // Update main display
             document.getElementById('hours').textContent = hours;
             document.getElementById('minutes').textContent = minutes;
-
-            const date = now.toLocaleDateString('en-US', {
-                weekday: 'long',
+            
+                const date = now.toLocaleDateString('en-US', {
+                weekday: 'short',
                 year: 'numeric',
-                month: 'long',
+                month: 'numeric',
                 day: 'numeric'
-            });
+            }).toUpperCase();
+            
+            // Update main date display
             document.getElementById('date').textContent = date;
 
             adjustFontSize(); // Adjust the font size
@@ -205,6 +280,27 @@
         // Adjust font size on window resize or orientation change
         window.addEventListener('resize', adjustFontSize);
         window.addEventListener('orientationchange', adjustFontSize);
+        
+        // Mirror toggle functionality
+        const mirrorToggle = document.getElementById('mirror-toggle');
+        const content = document.getElementById('content-wrapper');
+        
+        mirrorToggle.addEventListener('click', function() {
+            content.classList.toggle('mirror-mode');
+            // Store preference in localStorage
+            const isMirrored = content.classList.contains('mirror-mode');
+            localStorage.setItem('hudMirrorMode', isMirrored);
+            
+            // Update button text
+            mirrorToggle.textContent = isMirrored ? "NORMAL" : "MIRROR";
+        });
+        
+        // Check for saved preference
+        const savedMirrorMode = localStorage.getItem('hudMirrorMode');
+        if (savedMirrorMode === 'true') {
+            content.classList.add('mirror-mode');
+            mirrorToggle.textContent = "NORMAL";
+        }
     </script>
 
     <script>
